@@ -9,20 +9,20 @@ import bgImage from "../assets/bg-img.webp";
 import { FiMail, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
 
 export default function Login() {
-  const [email, setEmail] = useState('');
+  const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [error, setError]       = useState('');
+  const [loading, setLoading]   = useState(false);
   const [showPass, setShowPass] = useState(false);
 
   const { login } = useAuth();
-  const navigate = useNavigate();
+  const navigate  = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
-    if (!email.trim()) return setError('Email is required.');
+    if (!email.trim())    return setError('Email is required.');
     if (!password.trim()) return setError('Password is required.');
     if (!/\S+@\S+\.\S+/.test(email)) return setError('Please enter a valid email address.');
 
@@ -67,12 +67,12 @@ export default function Login() {
         style={{
           position: "relative",
           zIndex: 1,
-          width: "580px",
+          width: "460px",
           maxWidth: "90%",
           background: "rgba(255,255,255,0.94)",
           backdropFilter: "blur(20px)",
           borderRadius: "28px",
-          padding: "45px 50px",
+          padding: "40px",
           border: "1.5px solid rgba(245, 124, 0, 0.12)",
           boxShadow: "0 20px 50px rgba(245, 124, 0, 0.03), 0 30px 60px rgba(0, 0, 0, 0.15)",
         }}
@@ -88,8 +88,8 @@ export default function Login() {
             src={logo}
             alt="Geeta Group Logo"
             style={{
-              width: "90px",
-              height: "90px",
+              width: "100px",
+              height: "100px",
               objectFit: "contain",
               display: "block",
               margin: "0 auto",
@@ -99,11 +99,11 @@ export default function Login() {
 
         <h1
           style={{
-            fontSize: "2.8rem",
+            fontSize: "2.2rem",
             fontWeight: "800",
             textAlign: "center",
             marginTop: "0px",
-            marginBottom: "8px",
+            marginBottom: "6px",
             color: "#1e293b",
             letterSpacing: "-0.03em",
           }}
@@ -113,12 +113,12 @@ export default function Login() {
 
         <h2
           style={{
-            fontSize: "1.45rem",
+            fontSize: "1.25rem",
             fontWeight: "700",
             textAlign: "center",
             color: "#F57C00",
             marginTop: "0px",
-            marginBottom: "10px",
+            marginBottom: "8px",
           }}
         >
           Geeta Group of Institutions
@@ -128,9 +128,9 @@ export default function Login() {
           style={{
             textAlign: "center",
             color: "#64748b",
-            fontSize: "0.95rem",
+            fontSize: "0.85rem",
             marginTop: "0px",
-            marginBottom: "30px",
+            marginBottom: "25px",
           }}
         >
           Employee Attendance Management System
