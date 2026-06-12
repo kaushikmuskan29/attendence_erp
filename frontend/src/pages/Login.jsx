@@ -4,23 +4,25 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import logo from "../assets/logo.png"
+import logo from "../assets/logo.png";
+import bgImage from "../assets/bg-img.webp";
+import { FiMail, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
 
 export default function Login() {
-  const [email, setEmail]       = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError]       = useState('');
-  const [loading, setLoading]   = useState(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const [showPass, setShowPass] = useState(false);
 
   const { login } = useAuth();
-  const navigate  = useNavigate();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
-    if (!email.trim())    return setError('Email is required.');
+    if (!email.trim()) return setError('Email is required.');
     if (!password.trim()) return setError('Password is required.');
     if (!/\S+@\S+\.\S+/.test(email)) return setError('Please enter a valid email address.');
 
@@ -36,33 +38,103 @@ export default function Login() {
   };
 
   return (
-    <div className="login-page">
-      {/* Background orbs */}
-      <div className="login-bg-orb" style={{ width: 400, height: 400, background: 'var(--color-primary)', top: -100, left: -100 }} />
-      <div className="login-bg-orb" style={{ width: 300, height: 300, background: '#FB923C', bottom: -80, right: -80 }} />
-      <div className="login-bg-orb" style={{ width: 200, height: 200, background: 'var(--color-warning)', bottom: 100, left: '30%' }} />
+    <div
+      className="login-page"
+      style={{
+        minHeight: "100vh",
+        backgroundImage: `url(${bgImage})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        position: "relative",
+      }}
+    >
+      {/* Dark Overlay */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: "rgba(0,0,0,0.45)",
+          backdropFilter: "blur(1px)",
+        }}
+      ></div>
 
-      <div className="login-card">
+      <div
+        className="login-card"
+        style={{
+          position: "relative",
+          zIndex: 1,
+          width: "580px",
+          maxWidth: "90%",
+          background: "rgba(255,255,255,0.94)",
+          backdropFilter: "blur(20px)",
+          borderRadius: "28px",
+          padding: "45px 50px",
+          border: "1.5px solid rgba(245, 124, 0, 0.12)",
+          boxShadow: "0 20px 50px rgba(245, 124, 0, 0.03), 0 30px 60px rgba(0, 0, 0, 0.15)",
+        }}
+      >
         {/* Logo */}
-        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <div style={{ width: 90, height: 90, margin: '0 auto 1rem' }}>
-            <img
-              src={logo}
-              alt="AttendERP Logo"
-              style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'contain',
-              }}
-            />
-          </div>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 800, margin: 0, color: 'var(--color-text)', letterSpacing: '-0.03em' }}>
-            AttendERP
-          </h1>
-          <p style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem', margin: '0.35rem 0 0' }}>
-            Employee Attendance Management
-          </p>
+        <div
+          style={{
+            textAlign: "center",
+            marginBottom: "0px",
+          }}
+        >
+          <img
+            src={logo}
+            alt="Geeta Group Logo"
+            style={{
+              width: "130px",
+              height: "130px",
+              objectFit: "contain",
+              display: "block",
+              margin: "0 auto",
+            }}
+          />
         </div>
+
+        <h1
+          style={{
+            fontSize: "2.8rem",
+            fontWeight: "800",
+            textAlign: "center",
+            marginTop: "0px",
+            marginBottom: "8px",
+            color: "#1e293b",
+            letterSpacing: "-0.03em",
+          }}
+        >
+          AttendERP
+        </h1>
+
+        <h2
+          style={{
+            fontSize: "1.45rem",
+            fontWeight: "700",
+            textAlign: "center",
+            color: "#F57C00",
+            marginTop: "0px",
+            marginBottom: "10px",
+          }}
+        >
+          Geeta Group of Institutions
+        </h2>
+
+        <p
+          style={{
+            textAlign: "center",
+            color: "#64748b",
+            fontSize: "0.95rem",
+            marginTop: "0px",
+            marginBottom: "30px",
+          }}
+        >
+          Employee Attendance Management System
+        </p>
 
         {/* Form */}
         <form onSubmit={handleSubmit} noValidate>
@@ -72,50 +144,93 @@ export default function Login() {
             </div>
           )}
 
-          <div className="form-group">
+          <div className="form-group" style={{ marginBottom: "1.25rem" }}>
             <label htmlFor="login-email" className="form-label">Email Address</label>
-            <input
-              id="login-email"
-              type="email"
-              className="form-input"
-              placeholder="admin@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              autoComplete="email"
-              autoFocus
-            />
+            <div style={{ position: "relative" }}>
+              <FiMail
+                style={{
+                  position: "absolute",
+                  left: "20px",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  color: "#94a3b8",
+                  fontSize: "1.2rem",
+                  zIndex: 2,
+                }}
+              />
+              <input
+                id="login-email"
+                type="email"
+                placeholder="admin@example.com"
+                className="form-input"
+                style={{ paddingLeft: "52px" }}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                autoComplete="email"
+                autoFocus
+              />
+            </div>
           </div>
 
-          <div className="form-group" style={{ position: 'relative' }}>
+          <div className="form-group" style={{ marginBottom: "1.5rem" }}>
             <label htmlFor="login-password" className="form-label">Password</label>
-            <input
-              id="login-password"
-              type={showPass ? 'text' : 'password'}
-              className="form-input"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete="current-password"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPass(v => !v)}
-              style={{
-                position: 'absolute', right: '0.75rem', top: '2rem',
-                background: 'none', border: 'none', cursor: 'pointer',
-                color: 'var(--color-text-muted)', fontSize: '1rem',
-              }}
-              aria-label={showPass ? 'Hide password' : 'Show password'}
-            >
-              {showPass ? '🙈' : '👁️'}
-            </button>
+            <div style={{ position: "relative" }}>
+              <FiLock
+                style={{
+                  position: "absolute",
+                  left: "20px",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  color: "#94a3b8",
+                  fontSize: "1.2rem",
+                  zIndex: 2,
+                }}
+              />
+              <input
+                id="login-password"
+                type={showPass ? "text" : "password"}
+                className="form-input"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                style={{ paddingLeft: "52px", paddingRight: "52px" }}
+                autoComplete="current-password"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPass(!showPass)}
+                style={{
+                  position: "absolute",
+                  right: "20px",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  background: "transparent",
+                  border: "none",
+                  cursor: "pointer",
+                  color: "#64748b",
+                  display: "flex",
+                  alignItems: "center",
+                  zIndex: 2,
+                }}
+              >
+                {showPass ? <FiEyeOff size={20} /> : <FiEye size={20} />}
+              </button>
+            </div>
           </div>
 
           <button
             id="login-submit-btn"
             type="submit"
             className="btn btn-primary"
-            style={{ width: '100%', justifyContent: 'center', padding: '0.75rem', fontSize: '0.95rem', marginTop: '0.5rem' }}
+            style={{
+              width: "100%",
+              height: "58px",
+              borderRadius: "30px",
+              fontSize: "1rem",
+              fontWeight: "600",
+              marginTop: "1rem",
+              justifyContent: "center",
+            }}
             disabled={loading}
           >
             {loading ? (
@@ -124,14 +239,10 @@ export default function Login() {
                 Signing in...
               </>
             ) : (
-              'Log In →'
+              'LOG IN →'
             )}
           </button>
         </form>
-
-        <div style={{ textAlign: 'center', marginTop: '1.5rem', color: 'var(--color-text-faint)', fontSize: '0.75rem' }}>
-          Default: admin@example.com / password
-        </div>
       </div>
     </div>
   );
