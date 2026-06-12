@@ -58,7 +58,7 @@ export default function Login() {
           position: "absolute",
           inset: 0,
           background: "rgba(0,0,0,0.45)",
-          backdropFilter: "blur(1px)",
+          backdropFilter: "blur(5px)",
         }}
       ></div>
 
