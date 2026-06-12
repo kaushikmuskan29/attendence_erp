@@ -123,7 +123,7 @@ export default function Login() {
                 Signing in...
               </>
             ) : (
-              'Sign In →'
+              'Log In →'
             )}
           </button>
         </form>
