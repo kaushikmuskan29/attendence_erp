@@ -44,23 +44,18 @@ export default function Login() {
 
       <div className="login-card">
         {/* Logo */}
-        <div
-  style={{
-    width: 90,
-    height: 90,
-    margin: '0 auto 1rem',
-  }}
->
-  <img
-    src={logo}
-    alt="AttendERP Logo"
-    style={{
-      width: '100%',
-      height: '100%',
-      objectFit: 'contain',
-    }}
-  />
-</div>
+        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+          <div style={{ width: 90, height: 90, margin: '0 auto 1rem' }}>
+            <img
+              src={logo}
+              alt="AttendERP Logo"
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'contain',
+              }}
+            />
+          </div>
           <h1 style={{ fontSize: '1.5rem', fontWeight: 800, margin: 0, color: 'var(--color-text)', letterSpacing: '-0.03em' }}>
             AttendERP
           </h1>
