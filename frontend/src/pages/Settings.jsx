@@ -47,12 +47,13 @@ export default function Settings() {
         setPassword('');
         setConfirmPass('');
         
-        // Context might store admin. We can trigger a state update by refreshing window or directly updating context
-        // Context stores token. If token payload is updated or we just update local storage:
-        const currentData = JSON.parse(localStorage.getItem('attend_erp_auth') || '{}');
-        if (currentData.admin) {
-          currentData.admin = { ...currentData.admin, name, email };
-          localStorage.setItem('attend_erp_auth', JSON.stringify(currentData));
+        // Context stores admin under erp_admin key
+        const storedAdmin = localStorage.getItem('erp_admin');
+        if (storedAdmin) {
+          const adminObj = JSON.parse(storedAdmin);
+          adminObj.name = name;
+          adminObj.email = email;
+          localStorage.setItem('erp_admin', JSON.stringify(adminObj));
         }
         // Force refresh context values or advise user to re-login to see sidebar updates
         setSuccess('Profile updated successfully! Refresh the page to see changes in the sidebar.');
