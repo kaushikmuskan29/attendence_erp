@@ -4,6 +4,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import logo from "../assets/logo.png"
 
 export default function Login() {
   const [email, setEmail]       = useState('');
@@ -43,18 +44,23 @@ export default function Login() {
 
       <div className="login-card">
         {/* Logo */}
-        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <div style={{
-            width: 60, height: 60,
-            background: 'linear-gradient(135deg, var(--color-primary), #FB923C)',
-            borderRadius: 16,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: '1.75rem',
-            margin: '0 auto 1rem',
-            boxShadow: '0 8px 24px rgba(245,124,0,0.25)',
-          }}>
-            📅
-          </div>
+        <div
+  style={{
+    width: 90,
+    height: 90,
+    margin: '0 auto 1rem',
+  }}
+>
+  <img
+    src={logo}
+    alt="AttendERP Logo"
+    style={{
+      width: '100%',
+      height: '100%',
+      objectFit: 'contain',
+    }}
+  />
+</div>
           <h1 style={{ fontSize: '1.5rem', fontWeight: 800, margin: 0, color: 'var(--color-text)', letterSpacing: '-0.03em' }}>
             AttendERP
           </h1>
