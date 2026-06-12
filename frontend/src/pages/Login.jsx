@@ -88,8 +88,8 @@ export default function Login() {
             src={logo}
             alt="Geeta Group Logo"
             style={{
-              width: "130px",
-              height: "130px",
+              width: "90px",
+              height: "90px",
               objectFit: "contain",
               display: "block",
               margin: "0 auto",
