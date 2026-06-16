@@ -88,7 +88,7 @@ export default function Login() {
           background: "rgba(255,255,255,0.94)",
           backdropFilter: "blur(20px)",
           borderRadius: "28px",
-          padding: "40px",
+          padding: "30px 36px 24px",
           border: "1.5px solid rgba(245, 124, 0, 0.12)",
           boxShadow: "0 20px 50px rgba(245, 124, 0, 0.03), 0 30px 60px rgba(0, 0, 0, 0.15)",
         }}
@@ -104,8 +104,8 @@ export default function Login() {
             src={logo}
             alt="Geeta Group Logo"
             style={{
-              width: "100px",
-              height: "100px",
+              width: "70px",
+              height: "70px",
               objectFit: "contain",
               display: "block",
               margin: "0 auto",
@@ -115,11 +115,11 @@ export default function Login() {
 
         <h1
           style={{
-            fontSize: "2.2rem",
+            fontSize: "1.8rem",
             fontWeight: "800",
             textAlign: "center",
             marginTop: "0px",
-            marginBottom: "6px",
+            marginBottom: "4px",
             color: "#1e293b",
             letterSpacing: "-0.03em",
           }}
@@ -130,12 +130,12 @@ export default function Login() {
         {view === 'login' ? (
           <h2
             style={{
-              fontSize: "1.25rem",
+              fontSize: "1.05rem",
               fontWeight: "700",
               textAlign: "center",
               color: "#F57C00",
               marginTop: "0px",
-              marginBottom: "8px",
+              marginBottom: "4px",
             }}
           >
             Geeta Group of Institutions
@@ -148,7 +148,7 @@ export default function Login() {
             color: "#64748b",
             fontSize: "0.85rem",
             marginTop: "0px",
-            marginBottom: "25px",
+            marginBottom: "18px",
           }}
         >
           {view === 'login'
@@ -171,7 +171,7 @@ export default function Login() {
             </div>
           )}
 
-          <div className="form-group" style={{ marginBottom: "1.25rem" }}>
+          <div className="form-group" style={{ marginBottom: "0.85rem" }}>
             <label htmlFor="login-email" className="form-label">Email Address</label>
             <div style={{ position: "relative" }}>
               <FiMail
@@ -190,7 +190,7 @@ export default function Login() {
                 type="email"
                 placeholder="admin@example.com"
                 className="form-input"
-                style={{ paddingLeft: "52px" }}
+                style={{ paddingLeft: "52px", height: "48px" }}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 autoComplete="email"
@@ -201,7 +201,7 @@ export default function Login() {
 
           {view === 'login' && (
             <>
-              <div className="form-group" style={{ marginBottom: "1.5rem" }}>
+              <div className="form-group" style={{ marginBottom: "1rem" }}>
                 <label htmlFor="login-password" className="form-label">Password</label>
                 <div style={{ position: "relative" }}>
                   <FiLock
@@ -222,7 +222,7 @@ export default function Login() {
                     placeholder="Password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    style={{ paddingLeft: "52px", paddingRight: "52px" }}
+                    style={{ paddingLeft: "52px", paddingRight: "52px", height: "48px" }}
                     autoComplete="current-password"
                   />
                   <button
@@ -248,7 +248,7 @@ export default function Login() {
               </div>
 
               {/* Forgot password link */}
-              <div style={{ textAlign: "right", marginTop: "-0.5rem", marginBottom: "1.5rem" }}>
+              <div style={{ textAlign: "right", marginTop: "-0.4rem", marginBottom: "1.1rem" }}>
                 <button
                   type="button"
                   onClick={() => { setView('forgot'); setError(''); setSuccess(''); }}
@@ -274,11 +274,11 @@ export default function Login() {
             className="btn btn-primary"
             style={{
               width: "100%",
-              height: "58px",
+              height: "48px",
               borderRadius: "30px",
               fontSize: "1rem",
               fontWeight: "600",
-              marginTop: "0.5rem",
+              marginTop: "0.25rem",
               justifyContent: "center",
             }}
             disabled={loading}
