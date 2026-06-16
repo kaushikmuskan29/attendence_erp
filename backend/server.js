@@ -10,11 +10,12 @@ const path         = require('path');
 const errorHandler = require('./middleware/errorHandler');
 
 // Route imports
-const authRoutes       = require('./routes/auth');
-const employeeRoutes   = require('./routes/employees');
-const attendanceRoutes = require('./routes/attendance');
-const dashboardRoutes  = require('./routes/dashboard');
-const reportRoutes     = require('./routes/reports');
+const authRoutes        = require('./routes/auth');
+const employeeRoutes    = require('./routes/employees');
+const attendanceRoutes  = require('./routes/attendance');
+const dashboardRoutes   = require('./routes/dashboard');
+const reportRoutes      = require('./routes/reports');
+const exceptionRoutes   = require('./routes/exceptions');
 
 // Initialise DB connection (side-effect: verifies connection)
 require('./config/db');
@@ -37,10 +38,12 @@ app.use(express.urlencoded({ extended: true }));
 
 /* ── Routes ───────────────────────────────────────────────── */
 app.use('/api/auth',       authRoutes);
+app.use('/api/employees',  exceptionRoutes);   // MUST be before employeeRoutes — static /exceptions/active beats /:id
 app.use('/api/employees',  employeeRoutes);
 app.use('/api/attendance', attendanceRoutes);
 app.use('/api/dashboard',  dashboardRoutes);
 app.use('/api/reports',    reportRoutes);
+
 
 /* ── Health check ─────────────────────────────────────────── */
 app.get('/api/health', (_req, res) => {
@@ -57,8 +60,8 @@ app.use(errorHandler);
 
 /* ── Start server ─────────────────────────────────────────── */
 app.listen(PORT, () => {
-  console.log(`🚀  Server running on http://localhost:${PORT}`);
-  console.log(`📋  Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
 });
 
 module.exports = app;

@@ -5,21 +5,17 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
-import Sidebar from './components/Sidebar';
 import Navbar from './components/Navbar';
 import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
 import Employees from './pages/Employees';
-import Upload from './pages/Upload';
 import Reports from './pages/Reports';
-import Settings from './pages/Settings';
+import ResetPassword from './pages/ResetPassword';
 
 function AppLayout({ children }) {
   return (
     <div className="app-layout">
-      <Sidebar />
+      <Navbar />
       <div className="main-content">
-        <Navbar />
         <main>{children}</main>
       </div>
     </div>
@@ -33,29 +29,16 @@ export default function App() {
         <Routes>
           {/* Public */}
           <Route path="/login" element={<Login />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
 
           {/* Protected */}
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <AppLayout><Dashboard /></AppLayout>
-              </ProtectedRoute>
-            }
-          />
+          {/* /dashboard redirects to /employees for any stale links */}
+          <Route path="/dashboard" element={<Navigate to="/employees" replace />} />
           <Route
             path="/employees"
             element={
               <ProtectedRoute>
                 <AppLayout><Employees /></AppLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/upload"
-            element={
-              <ProtectedRoute>
-                <AppLayout><Upload /></AppLayout>
               </ProtectedRoute>
             }
           />
@@ -67,18 +50,10 @@ export default function App() {
               </ProtectedRoute>
             }
           />
-          <Route
-            path="/settings"
-            element={
-              <ProtectedRoute>
-                <AppLayout><Settings /></AppLayout>
-              </ProtectedRoute>
-            }
-          />
 
-          {/* Redirect root */}
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          {/* Redirect root and unknown paths to /employees */}
+          <Route path="/" element={<Navigate to="/employees" replace />} />
+          <Route path="*" element={<Navigate to="/employees" replace />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>

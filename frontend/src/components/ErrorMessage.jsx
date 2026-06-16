@@ -1,11 +1,13 @@
 /**
  * components/ErrorMessage.jsx
  */
+import { FiAlertCircle } from 'react-icons/fi';
+
 export default function ErrorMessage({ message, onRetry }) {
   if (!message) return null;
   return (
     <div className="alert alert-error" role="alert">
-      <span>⚠️</span>
+      <FiAlertCircle size={16} style={{ flexShrink: 0 }} />
       <div style={{ flex: 1 }}>
         {message}
         {onRetry && (

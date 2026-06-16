@@ -48,6 +48,38 @@ class Admin {
     }
     return Admin.findById(id);
   }
+
+  /**
+   * Save reset token and expiration date for an admin.
+   */
+  static async updateResetToken(email, token, expiresAt) {
+    await db.query(
+      'UPDATE admins SET reset_token = ?, reset_token_expires = ? WHERE email = ?',
+      [token, expiresAt, email]
+    );
+  }
+
+  /**
+   * Find an admin by active reset token.
+   */
+  static async findByResetToken(token) {
+    const [rows] = await db.query(
+      'SELECT * FROM admins WHERE reset_token = ? LIMIT 1',
+      [token]
+    );
+    return rows[0] || null;
+  }
+
+  /**
+   * Reset password and clear token columns.
+   */
+  static async resetPassword(id, hashedPassword) {
+    await db.query(
+      'UPDATE admins SET password = ?, reset_token = NULL, reset_token_expires = NULL WHERE id = ?',
+      [hashedPassword, id]
+    );
+    return Admin.findById(id);
+  }
 }
 
 module.exports = Admin;

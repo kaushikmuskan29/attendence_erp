@@ -2,8 +2,9 @@
  * services/reportService.js
  * Generates day-wise and monthly attendance reports using attendanceService logic.
  */
-const Employee   = require('../models/Employee');
-const Attendance = require('../models/Attendance');
+const Employee          = require('../models/Employee');
+const Attendance        = require('../models/Attendance');
+const EmployeeException = require('../models/EmployeeException');
 const { buildEmployeeReport } = require('./attendanceService');
 
 /**
@@ -12,8 +13,9 @@ const { buildEmployeeReport } = require('./attendanceService');
  * @returns {Promise<Object[]>}
  */
 async function getMonthlyReport(month) {
-  const employees     = await Employee.findAllSimple();
-  const allAttendance = await Attendance.findByMonth(month);
+  const employees          = await Employee.findAllSimple();
+  const allAttendance      = await Attendance.findByMonth(month);
+  const exceptionsByEmp    = await EmployeeException.findAllGroupedByEmployee();
 
   // Group attendance by employee_id
   const byEmployee = {};
@@ -24,7 +26,7 @@ async function getMonthlyReport(month) {
 
   return employees.map(emp => {
     const rows   = byEmployee[emp.id] || [];
-    const report = buildEmployeeReport(emp, rows, month);
+    const report = buildEmployeeReport(emp, rows, month, exceptionsByEmp[emp.id] || []);
 
     return {
       employee: {
@@ -47,15 +49,16 @@ async function getEmployeeReport(employeeId, month) {
   const emp = await Employee.findById(employeeId);
   if (!emp) throw Object.assign(new Error('Employee not found'), { status: 404 });
 
-  const rows   = await Attendance.findByEmployeeAndMonth(employeeId, month);
-  const report = buildEmployeeReport(emp, rows, month);
+  const rows       = await Attendance.findByEmployeeAndMonth(employeeId, month);
+  const exceptions = await EmployeeException.findByEmployee(employeeId);
+  const report     = buildEmployeeReport(emp, rows, month, exceptions);
 
   return {
     employee: {
-      id:                  emp.id,
-      employee_code:       emp.employee_code,
-      name:                emp.name,
-      office_start_time:   emp.office_start_time,
+      id:                   emp.id,
+      employee_code:        emp.employee_code,
+      name:                 emp.name,
+      office_start_time:    emp.office_start_time,
       grace_period_minutes: emp.grace_period_minutes,
     },
     ...report,

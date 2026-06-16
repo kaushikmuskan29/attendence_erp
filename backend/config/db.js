@@ -20,9 +20,26 @@ const pool = mysql.createPool({
 
 // Verify connection on startup
 pool.getConnection()
-  .then(conn => {
+  .then(async conn => {
     console.log('✅  MySQL connected successfully');
     conn.release();
+
+    // Auto-migration for admin forgot password fields
+    try {
+      const [columns] = await pool.query('SHOW COLUMNS FROM admins');
+      const columnNames = columns.map(c => c.Field);
+      
+      if (!columnNames.includes('reset_token')) {
+        await pool.query('ALTER TABLE admins ADD COLUMN reset_token VARCHAR(255) DEFAULT NULL AFTER password');
+        console.log('✅ Added column reset_token to admins table');
+      }
+      if (!columnNames.includes('reset_token_expires')) {
+        await pool.query('ALTER TABLE admins ADD COLUMN reset_token_expires DATETIME DEFAULT NULL AFTER reset_token');
+        console.log('✅ Added column reset_token_expires to admins table');
+      }
+    } catch (migErr) {
+      console.error('❌ Failed to run auto-migration for admins columns:', migErr.message);
+    }
   })
   .catch(err => {
     console.error('❌  MySQL connection failed:', err.message);

@@ -2,8 +2,9 @@
  * controllers/dashboardController.js
  * Returns monthly dashboard statistics.
  */
-const Employee   = require('../models/Employee');
-const Attendance = require('../models/Attendance');
+const Employee          = require('../models/Employee');
+const Attendance        = require('../models/Attendance');
+const EmployeeException = require('../models/EmployeeException');
 const { buildDashboardStats } = require('../services/attendanceService');
 
 /**
@@ -23,10 +24,11 @@ const getDashboard = async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'month must be in YYYY-MM format.' });
     }
 
-    const employees     = await Employee.findAllSimple();
-    const allAttendance = await Attendance.findByMonth(month);
+    const employees            = await Employee.findAllSimple();
+    const allAttendance        = await Attendance.findByMonth(month);
+    const exceptionsByEmployee = await EmployeeException.findAllGroupedByEmployee();
 
-    const stats = buildDashboardStats(employees, allAttendance, month);
+    const stats = buildDashboardStats(employees, allAttendance, month, exceptionsByEmployee);
 
     // Build per-employee summary for the overview table
     const { buildEmployeeReport } = require('../services/attendanceService');
@@ -38,7 +40,7 @@ const getDashboard = async (req, res, next) => {
 
     const employeeOverview = employees.map(emp => {
       const rows    = byEmployee[emp.id] || [];
-      const report  = buildEmployeeReport(emp, rows, month);
+      const report  = buildEmployeeReport(emp, rows, month, exceptionsByEmployee[emp.id] || []);
       return {
         id:            emp.id,
         employee_code: emp.employee_code,

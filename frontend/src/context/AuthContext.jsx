@@ -58,10 +58,15 @@ export function AuthProvider({ children }) {
     setAdmin(null);
   }, []);
 
+  const updateAdmin = useCallback((updatedAdmin) => {
+    localStorage.setItem('erp_admin', JSON.stringify(updatedAdmin));
+    setAdmin(updatedAdmin);
+  }, []);
+
   const isAuthenticated = !!token && !!admin;
 
   return (
-    <AuthContext.Provider value={{ admin, token, isAuthenticated, loading, login, logout }}>
+    <AuthContext.Provider value={{ admin, token, isAuthenticated, loading, login, logout, updateAdmin }}>
       {children}
     </AuthContext.Provider>
   );

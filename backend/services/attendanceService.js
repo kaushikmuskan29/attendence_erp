@@ -53,9 +53,10 @@ function calculateStatus(punchIn, officeStartTime, gracePeriodMinutes, lateCount
  * @param {Object}   employee        - employee row from DB
  * @param {Object[]} attendanceRows  - attendance rows for this employee in the month
  * @param {string}   month           - 'YYYY-MM'
+ * @param {Object[]} exceptions      - schedule exceptions for this employee (may be empty)
  * @returns {{ days: Object[], summary: Object }}
  */
-function buildEmployeeReport(employee, attendanceRows, month) {
+function buildEmployeeReport(employee, attendanceRows, month, exceptions = []) {
   const [year, mon] = month.split('-').map(Number);
   const totalDays   = getDaysInMonth(year, mon);
 
@@ -72,17 +73,27 @@ function buildEmployeeReport(employee, attendanceRows, month) {
     const dayStr = `${month}-${String(d).padStart(2, '0')}`;
     const rec    = attendanceMap[dayStr] || null;
 
-    const { status, dayCount } = calculateStatus(
+    // If an exception covers this date, use its override start time
+    const exc             = exceptions.find(e => dayStr >= e.from_date && dayStr <= e.to_date);
+    const effectiveStart  = exc ? exc.override_start_time : employee.office_start_time;
+
+    let { status, dayCount } = calculateStatus(
       rec ? rec.punch_in : null,
-      employee.office_start_time,
+      effectiveStart,
       employee.grace_period_minutes,
       lateCount,
       employee.free_lates_allowed != null ? employee.free_lates_allowed : 2
     );
 
-    // A "late" day is one where status is Late Free or Half Day
+    // If an exception covers this date and there is no punch-in, it's a Leave
+    if (exc && (!rec || !rec.punch_in)) {
+      status = 'Leave';
+      dayCount = 0;
+    }
+
+    // A "late" day is one where punch_in exceeds the effective deadline
     if (rec && rec.punch_in) {
-      const startMins    = timeToMinutes(employee.office_start_time);
+      const startMins    = timeToMinutes(effectiveStart);
       const deadlineMins = addMinutes(startMins, employee.grace_period_minutes);
       if (timeToMinutes(rec.punch_in) > deadlineMins) {
         lateCount++;
@@ -96,6 +107,7 @@ function buildEmployeeReport(employee, attendanceRows, month) {
       worked_minutes: rec ? rec.worked_minutes : null,
       status,
       day_count:     dayCount,
+      exception:     exc ? { note: exc.note || 'Leave / Exception', override_start_time: exc.override_start_time, override_end_time: exc.override_end_time } : null,
     });
   }
 
@@ -106,6 +118,7 @@ function buildEmployeeReport(employee, attendanceRows, month) {
     late_free:       days.filter(d => d.status === 'Late Free').length,
     half_day:        days.filter(d => d.status === 'Half Day').length,
     absent:          days.filter(d => d.status === 'Absent').length,
+    leave:           days.filter(d => d.status === 'Leave').length,
     total_day_count: days.reduce((s, d) => s + d.day_count, 0),
   };
 
@@ -115,12 +128,13 @@ function buildEmployeeReport(employee, attendanceRows, month) {
 /**
  * Build dashboard statistics for a month across all employees.
  *
- * @param {Object[]} employees      - all employee rows
- * @param {Object[]} allAttendance  - all attendance rows for the month (from Attendance.findByMonth)
- * @param {string}   month          - 'YYYY-MM'
+ * @param {Object[]} employees           - all employee rows
+ * @param {Object[]} allAttendance       - all attendance rows for the month
+ * @param {string}   month              - 'YYYY-MM'
+ * @param {Object}   exceptionsByEmployee - map of employee_id → Exception[]
  * @returns {Object}
  */
-function buildDashboardStats(employees, allAttendance, month) {
+function buildDashboardStats(employees, allAttendance, month, exceptionsByEmployee = {}) {
   const [year, mon] = month.split('-').map(Number);
   const totalDays   = getDaysInMonth(year, mon);
 
@@ -139,7 +153,7 @@ function buildDashboardStats(employees, allAttendance, month) {
 
   for (const emp of employees) {
     const rows   = byEmployee[emp.id] || [];
-    const report = buildEmployeeReport(emp, rows, month);
+    const report = buildEmployeeReport(emp, rows, month, exceptionsByEmployee[emp.id] || []);
 
     presentCount  += report.summary.present;
     lateFreeCount += report.summary.late_free;
