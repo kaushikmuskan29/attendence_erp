@@ -91,6 +91,23 @@ class Attendance {
     );
     return rows;
   }
+
+  /**
+   * Set status override for an attendance date.
+   * @param {number} employeeId
+   * @param {string} attendanceDate - 'YYYY-MM-DD'
+   * @param {string|null} statusOverride - 'Present', 'Late Free', 'Half Day', 'Absent', 'Leave' or null
+   */
+  static async setOverride(employeeId, attendanceDate, statusOverride) {
+    const [result] = await db.query(
+      `INSERT INTO attendance (employee_id, attendance_date, status_override)
+       VALUES (?, ?, ?)
+       ON DUPLICATE KEY UPDATE
+         status_override = VALUES(status_override)`,
+      [employeeId, attendanceDate, statusOverride]
+    );
+    return result;
+  }
 }
 
 module.exports = Attendance;

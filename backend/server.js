@@ -7,7 +7,17 @@ require('dotenv').config();
 const express      = require('express');
 const cors         = require('cors');
 const path         = require('path');
+const helmet       = require('helmet');
+const rateLimit    = require('express-rate-limit');
 const errorHandler = require('./middleware/errorHandler');
+
+// Validate required environment variables at boot time
+const requiredEnvVars = ['JWT_SECRET', 'DB_HOST', 'DB_NAME', 'DB_USER'];
+const missingEnvVars = requiredEnvVars.filter((varName) => !process.env[varName]);
+if (missingEnvVars.length > 0) {
+  console.error(`❌ Missing required environment variables: ${missingEnvVars.join(', ')}`);
+  process.exit(1);
+}
 
 // Route imports
 const authRoutes        = require('./routes/auth');
@@ -23,13 +33,44 @@ require('./config/db');
 const app  = express();
 const PORT = process.env.PORT || 5000;
 
-/* ── Middleware ───────────────────────────────────────────── */
+/* ── Security Middlewares ─────────────────────────────────── */
+app.use(helmet());
+
+// Rate limiters
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per window
+  message: { success: false, message: 'Too many requests from this IP, please try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 15, // Limit each IP to 15 login/forgot-password attempts per window
+  message: { success: false, message: 'Too many login attempts. Please try again after 15 minutes.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+app.use(generalLimiter);
+app.use('/api/auth/login', authLimiter);
+app.use('/api/auth/forgot-password', authLimiter);
+
+/* ── CORS & Body Parsing ──────────────────────────────────── */
+const allowedOrigins = process.env.CORS_ALLOWED_ORIGINS
+  ? process.env.CORS_ALLOWED_ORIGINS.split(',')
+  : ['http://localhost:5173', 'https://attendence-erp.vercel.app'];
+
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "https://attendence-erp.vercel.app"
-    ],
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes('*') || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error('Not allowed by CORS'));
+    },
     credentials: true
   })
 );
@@ -43,6 +84,7 @@ app.use('/api/employees',  employeeRoutes);
 app.use('/api/attendance', attendanceRoutes);
 app.use('/api/dashboard',  dashboardRoutes);
 app.use('/api/reports',    reportRoutes);
+
 
 
 /* ── Health check ─────────────────────────────────────────── */

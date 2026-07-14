@@ -5,6 +5,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getAllReports, getEmployeeReport } from '../api/reports';
 import { getEmployees } from '../api/employees';
+import { overrideAttendanceStatus } from '../api/attendance';
 import MonthSelector from '../components/MonthSelector';
 import StatusBadge from '../components/StatusBadge';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -97,6 +98,21 @@ export default function Reports() {
   }, [month, selectedEmp]);
 
   useEffect(() => { fetchReport(); }, [fetchReport]);
+
+  const handleStatusOverride = async (date, overrideValue) => {
+    if (selectedEmp === 'all') return;
+    setError('');
+    try {
+      await overrideAttendanceStatus({
+        employee_id: selectedEmp,
+        attendance_date: date,
+        status_override: overrideValue
+      });
+      fetchReport();
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to update attendance status.');
+    }
+  };
 
   // Parse Month string to extract name and year
   const getMonthYearNames = (monthStr) => {
@@ -273,7 +289,21 @@ export default function Reports() {
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-            <span style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--color-text)' }}>{d}</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+              <span style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--color-text)' }}>{d}</span>
+              {dayData.status_override && (
+                <span 
+                  title={`Overridden by Admin to ${dayData.status}`}
+                  style={{
+                    width: 6,
+                    height: 6,
+                    backgroundColor: 'var(--color-primary)',
+                    borderRadius: '50%',
+                    display: 'inline-block'
+                  }}
+                />
+              )}
+            </div>
             <span
               style={{
                 backgroundColor: config.bg,
@@ -631,6 +661,7 @@ export default function Reports() {
                       <th>Worked (min)</th>
                       <th>Status</th>
                       <th>Day Count</th>
+                      <th style={{ textAlign: 'right', paddingRight: '1.5rem' }}>Override Status</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -653,6 +684,46 @@ export default function Reports() {
                           <span style={{ fontWeight: 600, color: statusColors[d.status]?.text || 'var(--color-text)' }}>
                             {d.day_count}
                           </span>
+                        </td>
+                        <td style={{ textAlign: 'right', paddingRight: '1.5rem' }}>
+                          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+                            {d.status_override && (
+                              <span 
+                                title={`Overridden to ${d.status_override}`}
+                                style={{ 
+                                  fontSize: '0.62rem', 
+                                  backgroundColor: 'rgba(245, 124, 0, 0.1)', 
+                                  color: 'var(--color-primary)', 
+                                  padding: '2px 6px', 
+                                  borderRadius: 4, 
+                                  fontWeight: 700 
+                                }}
+                              >
+                                Manual
+                              </span>
+                            )}
+                            <select
+                              value={d.status_override || ''}
+                              onChange={(e) => handleStatusOverride(d.date, e.target.value)}
+                              style={{
+                                fontSize: '0.75rem',
+                                padding: '4px 8px',
+                                borderRadius: 6,
+                                border: '1px solid var(--color-border)',
+                                backgroundColor: 'var(--color-surface)',
+                                color: 'var(--color-text)',
+                                cursor: 'pointer',
+                                outline: 'none'
+                              }}
+                            >
+                              <option value="">Auto (System)</option>
+                              <option value="Present">Present</option>
+                              <option value="Late Free">Late Free</option>
+                              <option value="Half Day">Half Day</option>
+                              <option value="Absent">Absent</option>
+                              <option value="Leave">Leave</option>
+                            </select>
+                          </div>
                         </td>
                       </tr>
                     ))}

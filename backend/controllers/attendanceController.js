@@ -39,4 +39,40 @@ const uploadCSV = async (req, res, next) => {
   }
 };
 
-module.exports = { uploadCSV };
+/**
+ * POST /api/attendance/override
+ * Allows admin to override employee attendance status for a given date.
+ */
+const overrideStatus = async (req, res, next) => {
+  try {
+    const { employee_id, attendance_date, status_override } = req.body;
+
+    if (!employee_id || !attendance_date) {
+      return res.status(400).json({ success: false, message: 'employee_id and attendance_date are required.' });
+    }
+
+    // Validate status_override value
+    const validStatuses = ['Present', 'Late Free', 'Half Day', 'Absent', 'Leave', null, ''];
+    if (status_override !== undefined && !validStatuses.includes(status_override)) {
+      return res.status(400).json({ success: false, message: 'Invalid status override value.' });
+    }
+
+    const Attendance = require('../models/Attendance');
+    const targetStatus = (status_override === '' || status_override === null) ? null : status_override;
+    await Attendance.setOverride(employee_id, attendance_date, targetStatus);
+
+    res.json({
+      success: true,
+      message: 'Attendance status override updated successfully.',
+      data: {
+        employee_id,
+        attendance_date,
+        status_override: targetStatus
+      }
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports = { uploadCSV, overrideStatus };

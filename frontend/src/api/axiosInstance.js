@@ -1,8 +1,6 @@
 import axios from 'axios';
 
-const baseURL = import.meta.env.DEV
-  ? '/api'
-  : 'https://attendence-erp-1.onrender.com/api';
+const baseURL = import.meta.env.VITE_API_URL || '/api';
 
 const axiosInstance = axios.create({
   baseURL,

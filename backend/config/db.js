@@ -12,7 +12,7 @@ const pool = mysql.createPool({
   password:           process.env.DB_PASSWORD || '',
   database:           process.env.DB_NAME     || 'erp_attendance',
   waitForConnections: true,
-  connectionLimit:    10,
+  connectionLimit:    parseInt(process.env.DB_CONNECTION_LIMIT || '10', 10),
   queueLimit:         0,
   timezone:           '+00:00',
   dateStrings:        true,   // Return DATE columns as strings
@@ -39,6 +39,19 @@ pool.getConnection()
       }
     } catch (migErr) {
       console.error('❌ Failed to run auto-migration for admins columns:', migErr.message);
+    }
+
+    // Auto-migration for attendance status_override field
+    try {
+      const [columns] = await pool.query('SHOW COLUMNS FROM attendance');
+      const columnNames = columns.map(c => c.Field);
+
+      if (!columnNames.includes('status_override')) {
+        await pool.query('ALTER TABLE attendance ADD COLUMN status_override VARCHAR(50) DEFAULT NULL AFTER worked_minutes');
+        console.log('✅ Added column status_override to attendance table');
+      }
+    } catch (migErr) {
+      console.error('❌ Failed to run auto-migration for attendance columns:', migErr.message);
     }
   })
   .catch(err => {

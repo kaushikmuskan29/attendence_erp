@@ -5,3 +5,6 @@ export const uploadAttendanceCSV = (formData) =>
     headers: { 'Content-Type': 'multipart/form-data' },
     onUploadProgress: undefined, // caller can pass via config
   });
+
+export const overrideAttendanceStatus = (payload) =>
+  api.post('/attendance/override', payload);

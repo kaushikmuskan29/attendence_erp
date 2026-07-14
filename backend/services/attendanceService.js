@@ -91,8 +91,20 @@ function buildEmployeeReport(employee, attendanceRows, month, exceptions = []) {
       dayCount = 0;
     }
 
-    // A "late" day is one where punch_in exceeds the effective deadline
-    if (rec && rec.punch_in) {
+    // Apply Admin status override if present
+    if (rec && rec.status_override) {
+      status = rec.status_override;
+      if (status === 'Present' || status === 'Late Free') {
+        dayCount = 1.0;
+      } else if (status === 'Half Day') {
+        dayCount = 0.5;
+      } else if (status === 'Absent' || status === 'Leave') {
+        dayCount = 0.0;
+      }
+    }
+
+    // A "late" day is one where punch_in exceeds the effective deadline and not overridden to Present/Late Free
+    if (rec && rec.punch_in && (!rec.status_override || (rec.status_override !== 'Present' && rec.status_override !== 'Late Free'))) {
       const startMins    = timeToMinutes(effectiveStart);
       const deadlineMins = addMinutes(startMins, employee.grace_period_minutes);
       if (timeToMinutes(rec.punch_in) > deadlineMins) {
@@ -107,6 +119,7 @@ function buildEmployeeReport(employee, attendanceRows, month, exceptions = []) {
       worked_minutes: rec ? rec.worked_minutes : null,
       status,
       day_count:     dayCount,
+      status_override: rec ? rec.status_override : null,
       exception:     exc ? { note: exc.note || 'Leave / Exception', override_start_time: exc.override_start_time, override_end_time: exc.override_end_time } : null,
     });
   }
