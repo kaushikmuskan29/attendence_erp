@@ -10,7 +10,7 @@ USE erp_attendance;
 -- Password: password123  (bcrypt hash below)
 -- -------------------------------------------------------
 INSERT INTO admins (name, email, password) VALUES
-('System Admin', 'admin@example.com', '$2b$10$YQt7akhu5VusWdCORPjJyuLDsBzKYKyINnWTYOCDylUIweRBr0bES')
+('System Admin', 'admin@example.com', '$2b$10$VHpcRCS9WxoHhQHHrHL/q.BkPUDWmoMRwshkDFs3tYu5oYVkbjXUC')
 ON DUPLICATE KEY UPDATE name = VALUES(name), password = VALUES(password);
 
 -- -------------------------------------------------------

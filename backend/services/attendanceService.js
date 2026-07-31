@@ -133,6 +133,8 @@ function buildEmployeeReport(employee, attendanceRows, month, exceptions = []) {
     absent:          days.filter(d => d.status === 'Absent').length,
     leave:           days.filter(d => d.status === 'Leave').length,
     total_day_count: days.reduce((s, d) => s + d.day_count, 0),
+    overrides:       days.filter(d => d.status_override).length,
+    exceptions:      days.filter(d => d.exception).length,
   };
 
   return { days, summary };
@@ -163,6 +165,8 @@ function buildDashboardStats(employees, allAttendance, month, exceptionsByEmploy
   let halfDayCount  = 0;
   let absentCount   = 0;
   let totalDayCount = 0;
+  let overrideCount = 0;
+  let exceptionsCount = 0;
 
   for (const emp of employees) {
     const rows   = byEmployee[emp.id] || [];
@@ -173,6 +177,8 @@ function buildDashboardStats(employees, allAttendance, month, exceptionsByEmploy
     halfDayCount  += report.summary.half_day;
     absentCount   += report.summary.absent;
     totalDayCount += report.summary.total_day_count;
+    overrideCount += report.summary.overrides;
+    exceptionsCount += report.summary.exceptions;
   }
 
   const maxPossibleDays    = employees.length * totalDays;
@@ -189,6 +195,8 @@ function buildDashboardStats(employees, allAttendance, month, exceptionsByEmploy
     absent_count:         absentCount,
     total_day_count:      parseFloat(totalDayCount.toFixed(1)),
     attendance_percentage: attendancePercent,
+    overrides_count:      overrideCount,
+    exceptions_count:     exceptionsCount,
   };
 }
 

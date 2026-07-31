@@ -802,6 +802,26 @@ export default function Employees() {
       footerValue: dashLoading ? '…' : (stats.total_days ? `${stats.total_days} days` : '—'),
       progressWidth: '100%'
     },
+    {
+      label: 'Manual Overrides',
+      value: dashLoading ? '…' : (stats.overrides_count ?? 0),
+      Icon: FiEdit2,
+      variant: 'warning',
+      subtext: 'Manually changed status',
+      footerLabel: 'Active overrides',
+      footerValue: dashLoading ? '…' : `${stats.overrides_count ?? 0} days`,
+      progressWidth: stats.overrides_count ? `${Math.min(100, (stats.overrides_count / (stats.total_employees * stats.total_days || 1)) * 100)}%` : '0%'
+    },
+    {
+      label: 'Active Exceptions',
+      value: dashLoading ? '…' : (stats.exceptions_count ?? 0),
+      Icon: FiClock,
+      variant: 'danger',
+      subtext: 'Custom shift schedules',
+      footerLabel: 'Exceptions applied',
+      footerValue: dashLoading ? '…' : `${stats.exceptions_count ?? 0} days`,
+      progressWidth: stats.exceptions_count ? `${Math.min(100, (stats.exceptions_count / (stats.total_employees * stats.total_days || 1)) * 100)}%` : '0%'
+    },
   ];
 
   /* ── Render ─────────────────────────────────────────────── */
@@ -825,7 +845,7 @@ export default function Employees() {
       </div>
 
       {/* ── Stat Cards ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '200px 200px 1fr', gap: '1.25rem', marginBottom: '1.75rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.25rem', marginBottom: '1.75rem' }}>
         {STAT_CARDS.map((s) => (
           <div
             key={s.label}
@@ -937,10 +957,12 @@ export default function Employees() {
             </div>
           </div>
         ))}
+      </div>
 
-        {/* ── Upload Attendance Card ── */}
-        <div className="stat-card" style={{ height: '100%', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-lg)', padding: '1.25rem 1.5rem', boxShadow: 'var(--shadow-card)', background: 'var(--color-surface)', position: 'relative' }}>
-          <div style={{ display: 'flex', gap: '1.5rem', height: '100%', alignItems: 'stretch' }}>
+      {/* ── Upload Attendance Card ── */}
+      <div style={{ marginBottom: '1.75rem' }}>
+        <div className="stat-card" style={{ border: '1px solid var(--color-border)', borderRadius: 'var(--radius-lg)', padding: '1.25rem 1.5rem', boxShadow: 'var(--shadow-card)', background: 'var(--color-surface)', position: 'relative' }}>
+          <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'stretch' }}>
 
             {/* Left side: Upload actions and results */}
             <div style={{ flex: '1 1 50%', minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
@@ -1145,12 +1167,34 @@ export default function Employees() {
                       </span>
                     </td>
                     <td style={{ fontWeight: 600 }}>
-                      {emp.name}
-                      {activeExcEmpIds.has(emp.id) && (
-                        <span className="active-exception-badge" title="Has an active schedule exception today">
-                          <FiClock size={10} /> Exception Active
-                        </span>
-                      )}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
+                          <span>{emp.name}</span>
+                          {activeExcEmpIds.has(emp.id) && (
+                            <span className="active-exception-badge" title="Has an active schedule exception today">
+                              <FiClock size={10} /> Exception Active
+                            </span>
+                          )}
+                        </div>
+                        {(() => {
+                          const stats = dashData?.employees?.find(e => e.id === emp.id);
+                          if (!stats) return null;
+                          return (stats.overrides > 0 || stats.exceptions > 0) && (
+                            <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', marginTop: '0.1rem' }}>
+                              {stats.overrides > 0 && (
+                                <span style={{ fontSize: '0.65rem', backgroundColor: 'rgba(245, 124, 0, 0.08)', color: 'var(--color-primary)', border: '1px solid rgba(245, 124, 0, 0.2)', padding: '1px 5px', borderRadius: 4, display: 'inline-flex', alignItems: 'center', gap: '0.15rem' }} title={`${stats.overrides} manual status overrides applied in ${month}`}>
+                                  {stats.overrides} Override{stats.overrides > 1 ? 's' : ''}
+                                </span>
+                              )}
+                              {stats.exceptions > 0 && (
+                                <span style={{ fontSize: '0.65rem', backgroundColor: 'rgba(124, 58, 237, 0.08)', color: '#7C3AED', border: '1px solid rgba(124, 58, 237, 0.2)', padding: '1px 5px', borderRadius: 4, display: 'inline-flex', alignItems: 'center', gap: '0.15rem' }} title={`${stats.exceptions} schedule exceptions applied in ${month}`}>
+                                  {stats.exceptions} Exception{stats.exceptions > 1 ? 's' : ''}
+                                </span>
+                              )}
+                            </div>
+                          );
+                        })()}
+                      </div>
                     </td>
                     <td style={{ color: 'var(--color-text-muted)' }}>{emp.office_start_time ? emp.office_start_time.slice(0, 5) : '—'}</td>
                     <td style={{ color: 'var(--color-text-muted)' }}>{emp.office_end_time ? emp.office_end_time.slice(0, 5) : '—'}</td>

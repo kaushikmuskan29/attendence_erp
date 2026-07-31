@@ -538,6 +538,8 @@ export default function Reports() {
                   <th>Day Count</th>
                   <th>Absent</th>
                   <th>Leave</th>
+                  <th>Overrides</th>
+                  <th>Exceptions</th>
                   <th>Attendance %</th>
                   <th style={{ textAlign: 'right', paddingRight: '1.5rem' }}>Actions</th>
                 </tr>
@@ -586,6 +588,8 @@ export default function Reports() {
                         <td style={{ color: 'var(--color-primary)', fontWeight: 700 }}>{empReport.summary.total_day_count}</td>
                         <td style={{ color: 'var(--color-danger)', fontWeight: 600 }}>{empReport.summary.absent}</td>
                         <td style={{ color: '#7C3AED', fontWeight: 600 }}>{empReport.summary.leave || 0}</td>
+                        <td style={{ color: 'var(--color-warning)', fontWeight: 600 }}>{empReport.summary.overrides || 0}</td>
+                        <td style={{ color: '#6366F1', fontWeight: 600 }}>{empReport.summary.exceptions || 0}</td>
                         <td style={{ fontWeight: 700 }}>
                           <span style={{
                             color: attPct >= 90 ? 'var(--color-success)' : attPct >= 75 ? 'var(--color-warning)' : 'var(--color-danger)'
@@ -661,6 +665,7 @@ export default function Reports() {
                       <th>Worked (min)</th>
                       <th>Status</th>
                       <th>Day Count</th>
+                      <th>Schedule / Exceptions</th>
                       <th style={{ textAlign: 'right', paddingRight: '1.5rem' }}>Override Status</th>
                     </tr>
                   </thead>
@@ -684,6 +689,46 @@ export default function Reports() {
                           <span style={{ fontWeight: 600, color: statusColors[d.status]?.text || 'var(--color-text)' }}>
                             {d.day_count}
                           </span>
+                        </td>
+                        <td>
+                          {d.exception ? (
+                            <span 
+                              title={d.exception.note}
+                              style={{ 
+                                fontSize: '0.75rem', 
+                                backgroundColor: 'rgba(124, 58, 237, 0.08)', 
+                                color: '#7C3AED', 
+                                padding: '2px 8px', 
+                                borderRadius: 4, 
+                                fontWeight: 600,
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '0.25rem',
+                                border: '1px solid rgba(124, 58, 237, 0.2)'
+                              }}
+                            >
+                              Shift Override: {d.exception.override_start_time.slice(0, 5)} {d.exception.note ? `(${d.exception.note})` : ''}
+                            </span>
+                          ) : d.status_override ? (
+                            <span 
+                              style={{ 
+                                fontSize: '0.75rem', 
+                                backgroundColor: 'rgba(245, 124, 0, 0.08)', 
+                                color: 'var(--color-primary)', 
+                                padding: '2px 8px', 
+                                borderRadius: 4, 
+                                fontWeight: 600,
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '0.25rem',
+                                border: '1px solid rgba(245, 124, 0, 0.2)'
+                              }}
+                            >
+                              Overridden: {d.status_override}
+                            </span>
+                          ) : (
+                            <span style={{ color: 'var(--color-text-faint)', fontSize: '0.75rem' }}>Standard Shift</span>
+                          )}
                         </td>
                         <td style={{ textAlign: 'right', paddingRight: '1.5rem' }}>
                           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>

@@ -7,17 +7,17 @@ USE erp_attendance;
 
 -- Add office_end_time (default 18:00)
 ALTER TABLE employees
-  ADD COLUMN IF NOT EXISTS office_end_time TIME NOT NULL DEFAULT '18:00:00'
+  ADD COLUMN office_end_time TIME NOT NULL DEFAULT '18:00:00'
   AFTER office_start_time;
 
 -- Add working_minutes (auto-computed = end - start in minutes)
 ALTER TABLE employees
-  ADD COLUMN IF NOT EXISTS working_minutes SMALLINT UNSIGNED NOT NULL DEFAULT 540
+  ADD COLUMN working_minutes SMALLINT UNSIGNED NOT NULL DEFAULT 540
   AFTER office_end_time;
 
 -- Add free_lates_allowed per employee (replaces global hard-coded 2)
 ALTER TABLE employees
-  ADD COLUMN IF NOT EXISTS free_lates_allowed TINYINT UNSIGNED NOT NULL DEFAULT 2
+  ADD COLUMN free_lates_allowed TINYINT UNSIGNED NOT NULL DEFAULT 2
   AFTER grace_period_minutes;
 
 -- Back-fill working_minutes from existing start/end times
